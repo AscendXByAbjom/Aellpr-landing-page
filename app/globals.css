@@ -1,0 +1,487 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/*  Aellpr design tokens                                                */
+/* ------------------------------------------------------------------ */
+@theme {
+  --color-paper: #faf8f4;
+  --color-paper-2: #f3efe6;
+  --color-paper-3: #ebe5d8;
+  --color-ink: #17252b;
+  --color-ink-2: #22343b;
+  --color-muted: #676d6c;
+  --color-line: #dedfd8;
+  --color-orange: #f56b22;
+  --color-orange-deep: #dd5816;
+  --color-orange-glow: #ff9c4d;
+  --color-cream: #fff4e9;
+  --color-cream-2: #ffe8d4;
+  --color-purple: #3e4095;
+  --color-purple-deep: #2c2e72;
+  --color-purple-soft: #8f91d6;
+  --color-purple-tint: #ecebf7;
+  --color-shade: #122026;
+  --color-leaf: #2f7a5b;
+
+  /* One calm easing curve for everything */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+@theme inline {
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "Courier New", monospace;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Base                                                                */
+/* ------------------------------------------------------------------ */
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-padding-top: 88px;
+    interpolate-size: allow-keywords;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-paper);
+    overflow-x: clip;
+  }
+
+  /* Native smooth scrolling for in-page links — no scroll hijacking */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Dialog or mobile menu open → freeze the page behind it */
+  html:has(dialog[open]),
+  html:has([data-scroll-lock="true"]) {
+    overflow: hidden;
+  }
+
+  ::selection {
+    background: var(--color-orange);
+    color: white;
+  }
+
+  :focus-visible {
+    outline: 2.5px solid var(--color-orange);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  button,
+  summary {
+    cursor: pointer;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Utilities                                                           */
+/* ------------------------------------------------------------------ */
+@utility container-x {
+  width: min(1320px, 100%);
+  margin-inline: auto;
+  padding-inline: clamp(20px, 4.5vw, 56px);
+}
+
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+
+@utility display-xl {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7.6vw, 7.75rem);
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  font-weight: 500;
+}
+
+@utility display-lg {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5.2vw, 5.25rem);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  font-weight: 500;
+}
+
+@utility display-md {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.6vw, 3.25rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+}
+
+@utility stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid currentColor;
+  outline: 1px solid color-mix(in oklab, currentColor 35%, transparent);
+  outline-offset: 3px;
+  border-radius: 6px;
+  transform: rotate(-2deg);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Motion — refined, subtle, compositor-only (opacity + transform)     */
+/* ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  /* Scroll reveals: [data-reveal] gets .is-in from <RevealObserver/>.
+     html.js is set before paint, so content is never hidden without JS. */
+  html.js [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    transition:
+      opacity 0.8s var(--ease-out),
+      transform 0.8s var(--ease-out);
+    transition-delay: var(--d, 0ms);
+  }
+  html.js [data-reveal="fade"] {
+    transform: none;
+  }
+  html.js [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Headlines: lines fade up one after another */
+  html.js [data-reveal="lines"] {
+    opacity: 1;
+    transform: none;
+  }
+  html.js [data-reveal="lines"] > .line {
+    opacity: 0;
+    transform: translate3d(0, 0.32em, 0);
+    transition:
+      opacity 0.9s var(--ease-out),
+      transform 0.9s var(--ease-out);
+    transition-delay: calc(var(--d, 0ms) + var(--i, 0) * 90ms);
+  }
+  html.js [data-reveal="lines"].is-in > .line {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* SVG strokes draw in when their revealed ancestor arrives.
+     Paths opt in with pathLength="1". */
+  html.js [data-reveal] [data-draw] {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.6s var(--ease-out);
+    transition-delay: calc(var(--d, 0ms) + 200ms);
+  }
+  html.js [data-reveal].is-in [data-draw] {
+    stroke-dashoffset: 0;
+  }
+
+  /* Hero entrance — pure CSS, starts at first paint (no hydration wait) */
+  [data-enter] {
+    animation: enter 0.9s var(--ease-out) both;
+    animation-delay: var(--d, 0ms);
+  }
+  [data-enter="photo"] {
+    animation: enter-photo 1.6s var(--ease-out) both;
+  }
+  [data-enter="draw"] {
+    stroke-dasharray: 1;
+    animation: draw 1.8s var(--ease-out) both;
+    animation-delay: var(--d, 0ms);
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+}
+@keyframes enter-photo {
+  from {
+    transform: scale(1.06);
+  }
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+}
+
+/* Gentle parallax via CSS scroll-driven animations. Runs off the main
+   thread where supported; elsewhere the element simply stays put. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-parallax] {
+      animation: parallax linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}
+@keyframes parallax {
+  from {
+    transform: translate3d(0, calc(var(--p, 5) * -1%), 0);
+  }
+  to {
+    transform: translate3d(0, calc(var(--p, 5) * 1%), 0);
+  }
+}
+
+/* Below-the-fold sections skip layout and paint until they approach the
+   viewport. The size hints (measured) keep the scrollbar and in-page links
+   accurate before a section has rendered; "auto" remembers the real size. */
+main > section:not(:first-child),
+body > footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--cis, 1400px);
+}
+/* Hints are content-box heights: measured section height minus its padding. */
+#everyday {
+  --cis: 472px;
+}
+#three-ways {
+  --cis: 2104px;
+}
+#send {
+  --cis: 2204px;
+}
+#go {
+  --cis: 2222px;
+}
+#business-ai {
+  --cis: 2723px;
+}
+#how-it-works {
+  --cis: 1228px;
+}
+#trust {
+  --cis: 2043px;
+}
+#faq {
+  --cis: 1420px;
+}
+#next {
+  --cis: 1235px;
+}
+body > footer {
+  --cis: 864px;
+}
+@media (min-width: 768px) {
+  #everyday {
+    --cis: 423px;
+  }
+  #three-ways {
+    --cis: 2244px;
+  }
+  #send {
+    --cis: 1976px;
+  }
+  #go {
+    --cis: 1988px;
+  }
+  #business-ai {
+    --cis: 2100px;
+  }
+  #trust {
+    --cis: 1669px;
+  }
+  #next {
+    --cis: 1254px;
+  }
+  #faq {
+    --cis: 1178px;
+  }
+}
+@media (min-width: 1024px) {
+  #everyday {
+    --cis: 628px;
+  }
+  #three-ways {
+    --cis: 1021px;
+  }
+  #send {
+    --cis: 1384px;
+  }
+  #go {
+    --cis: 1325px;
+  }
+  #business-ai {
+    --cis: 1460px;
+  }
+  #how-it-works {
+    --cis: 628px;
+  }
+  #trust {
+    --cis: 1023px;
+  }
+  #faq {
+    --cis: 1011px;
+  }
+  #next {
+    --cis: 986px;
+  }
+  body > footer {
+    --cis: 845px;
+  }
+}
+
+/* Header reading-progress bar, driven by the page's scroll timeline */
+.scroll-progress {
+  display: none;
+}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: block;
+    transform-origin: 0 50%;
+    animation: progress linear both;
+    animation-timeline: scroll(root);
+  }
+}
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Marquee — slow, and paused whenever it is off screen */
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marquee var(--marquee-duration, 60s) linear infinite;
+  }
+  .marquee-track[data-reverse="true"] {
+    animation-direction: reverse;
+  }
+  .marquee:not(.is-visible) .marquee-track,
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+/* FAQ — native <details>, with a height transition where supported */
+.faq-item::details-content {
+  block-size: 0;
+  overflow-y: clip;
+  transition:
+    block-size 0.45s var(--ease-out),
+    content-visibility 0.45s allow-discrete;
+}
+.faq-item[open]::details-content {
+  block-size: auto;
+}
+.faq-item summary {
+  list-style: none;
+}
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Coming-soon dialog — native <dialog> with CSS enter/exit */
+.cs-dialog {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition:
+    opacity 0.3s var(--ease-out),
+    transform 0.4s var(--ease-out),
+    overlay 0.4s allow-discrete,
+    display 0.4s allow-discrete;
+}
+.cs-dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  .cs-dialog[open] {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+}
+.cs-dialog::backdrop {
+  background: rgb(23 37 43 / 0);
+  transition:
+    background-color 0.3s var(--ease-out),
+    overlay 0.4s allow-discrete,
+    display 0.4s allow-discrete;
+}
+.cs-dialog[open]::backdrop {
+  background: rgb(23 37 43 / 0.55);
+}
+@starting-style {
+  .cs-dialog[open]::backdrop {
+    background: rgb(23 37 43 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+}
