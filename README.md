@@ -12,4 +12,7 @@ npm run dev        # http://localhost:3000
 npm run build && npm start
 ```
 
-Deploy on Vercel with the default settings (no environment variables are needed yet).
+`npm run build` produces a **static site** in `out/` (`output: "export"` in
+`next.config.ts`); there is no server at runtime. Hosted on DigitalOcean App
+Platform as a static site: build command `npm run build`, output directory
+`out`. No environment variables are needed.

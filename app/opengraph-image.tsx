@@ -1,5 +1,8 @@
 import { ImageResponse } from "next/og";
 
+// Built once into a file for the static export (`output: "export"`).
+export const dynamic = "force-static";
+
 export const alt = "Aellpr — Your next move. Made possible.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
