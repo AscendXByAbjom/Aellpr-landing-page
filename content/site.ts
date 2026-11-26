@@ -33,7 +33,9 @@ export const ctas = {
 
 /** Toggle the optional "notify me" form inside the coming-soon dialog. */
 export const comingSoon = {
-  showNotifyForm: true,
+  // Waitlist disconnected (Michael, 26 Nov): the apps are being published,
+  // and the site is a static export with no server to receive sign-ups.
+  showNotifyForm: false,
   eyebrow: "App access",
   title: "Aellpr is almost on its way.",
   body: "This page introduces the Aellpr experience. Live delivery booking and app access links will be added here as soon as they’re available.",
